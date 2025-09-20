@@ -1,58 +1,92 @@
-#!/usr/bin/env python3
-"""Management command to seed the database with sample listings data."""
+"""
+Django settings for alx_travel_app project.
+"""
 
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from listings.models import Listing
-import uuid
+import environ
+import os
 
+env = environ.Env()
+environ.Env.read_env()
 
-class Command(BaseCommand):
-    """Command to seed listings data."""
-    help = 'Seeds the database with sample listings'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    def handle(self, *args, **options):
-        """Execute the seeding process."""
-        self.stdout.write(self.style.SUCCESS('Starting database seeding...'))
+SECRET_KEY = env('SECRET_KEY', default='your-secret-key-here')
 
-        # Create sample users
-        users = [
-            {'username': 'user1', 'email': 'user1@example.com', 'password': 'password123'},
-            {'username': 'user2', 'email': 'user2@example.com', 'password': 'password123'},
-        ]
-        for user_data in users:
-            User.objects.get_or_create(
-                username=user_data['username'],
-                defaults={'email': user_data['email'], 'password': user_data['password']}
-            )
+DEBUG = env.bool('DEBUG', default=True)
 
-        # Create sample listings
-        listings = [
-            {
-                'listing_id': uuid.uuid4(),
-                'title': 'Cozy Beach House',
-                'description': 'A beautiful beach house with ocean views.',
-                'price_per_night': 150.00,
-                'owner': User.objects.get(username='user1'),
-            },
-            {
-                'listing_id': uuid.uuid4(),
-                'title': 'Mountain Cabin',
-                'description': 'A rustic cabin in the mountains.',
-                'price_per_night': 100.00,
-                'owner': User.objects.get(username='user2'),
-            },
-        ]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-        for listing_data in listings:
-            Listing.objects.get_or_create(
-                listing_id=listing_data['listing_id'],
-                defaults={
-                    'title': listing_data['title'],
-                    'description': listing_data['description'],
-                    'price_per_night': listing_data['price_per_night'],
-                    'owner': listing_data['owner'],
-                }
-            )
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'listings',
+]
 
-        self.stdout.write(self.style.SUCCESS('Successfully seeded database with listings.'))
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'alx_travel_app.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'alx_travel_app.wsgi.application'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+STATIC_URL = 'static/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
